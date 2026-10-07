@@ -1,10 +1,11 @@
-name: CI Checks
-run-name: Running Terraform Checks by ${{ github.actor }}
+name: Terraform CI 
+run-name: Running Terraform CI by ${{ github.actor }}
 
 on:
  pull_request:
    branches:
      - main
+ workflow_dispatch:
 
 permissions:
   id-token: write   # Required for AWS OIDC authentication

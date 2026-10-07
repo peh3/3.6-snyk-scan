@@ -1,10 +1,10 @@
 name: Terraform CD
-run-name: Running Terraform Checks by ${{ github.actor }}
+run-name: Running Terraform CD by ${{ github.actor }}
 
 on:
+  push:
+    branches: [ "main" ]
   workflow_dispatch:
-  #push:
-   # branches: [ "main" ]
 
 permissions:
   id-token: write       # Required for OIDC

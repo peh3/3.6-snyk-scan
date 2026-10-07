@@ -25,7 +25,6 @@ resource "aws_iam_role" "github_oidc" {
   assume_role_policy = data.aws_iam_policy_document.github_trust.json
 }
 
-
 # 1. Consolidated AWS Managed Policies for Core Services
 resource "aws_iam_role_policy_attachment" "managed_policies" {
   for_each = toset([
@@ -42,7 +41,7 @@ resource "aws_iam_role_policy_attachment" "managed_policies" {
   policy_arn = each.value
 }
 
-# 2. Custom Inline Policy for IAM Role Creation, PassRole, and WAF CloudWatch Logs
+# 2. Custom Inline Policy for IAM Role Creation, PassRole, and Teardown
 data "aws_iam_policy_document" "deployment_extra_permissions" {
   statement {
     sid    = "IAMPassRoleAndRoleLifecycle"
@@ -57,7 +56,11 @@ data "aws_iam_policy_document" "deployment_extra_permissions" {
       "iam:AttachRolePolicy",
       "iam:DetachRolePolicy",
       "iam:PassRole",
-      "iam:TagRole"
+      "iam:TagRole",
+      # Required for Terraform destroy / read operations on IAM roles
+      "iam:ListInstanceProfilesForRole",
+      "iam:ListAttachedRolePolicies",
+      "iam:ListRolePolicies"
     ]
     resources = ["*"]
   }
@@ -82,26 +85,6 @@ resource "aws_iam_role_policy" "extra_permissions" {
   name   = "pipeline-extra-deployment-permissions"
   role   = aws_iam_role.github_oidc.name
   policy = data.aws_iam_policy_document.deployment_extra_permissions.json
-}
-
-resource "aws_iam_role_policy_attachment" "route53_full" {
-  role       = aws_iam_role.github_oidc.name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonRoute53FullAccess"
-}
-
-resource "aws_iam_role_policy_attachment" "dynamodb_full" {
-  role       = aws_iam_role.github_oidc.name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess"
-}
-
-resource "aws_iam_role_policy_attachment" "apigateway_admin" {
-  role       = aws_iam_role.github_oidc.name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonAPIGatewayAdministrator"
-}
-
-resource "aws_iam_role_policy_attachment" "certificate_manager_full" {
-  role       = aws_iam_role.github_oidc.name
-  policy_arn = "arn:aws:iam::aws:policy/AWSCertificateManagerFullAccess"
 }
 
 variable "github_repository_username" {
