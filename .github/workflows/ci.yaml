@@ -47,10 +47,6 @@ jobs:
       id: validate
       run: terraform validate -no-color
 
-    - name: Terraform Plan
-      id: plan
-      run: terraform plan -no-color
-
     - uses: terraform-linters/setup-tflint@v3
       with:
         tflint_version: latest
@@ -63,6 +59,10 @@ jobs:
 
     - name: Run TFLint
       run: tflint -f compact
+
+    - name: Terraform Plan
+      id: plan
+      run: terraform plan -no-color
 
   ########################################
   # Add a job for snyk scan of your code #
