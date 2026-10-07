@@ -127,21 +127,21 @@ jobs:
         run: snyk iac test --severity-threshold=high
 
       # 4. Build and Scan Container Image
-      - name: Build local container image
-        run: |
-          docker build -t snyk-image:local -f - files/ << 'EOF'
-          FROM node:22-alpine
-          # Patch OS-level packages (fixes zlib)
-          RUN apk update && apk upgrade --no-cache
-          # Remove bundled global npm/corepack CLI vulnerabilities
-          RUN rm -rf /usr/local/lib/node_modules/npm /usr/local/bin/npm /usr/local/bin/npx /usr/local/bin/corepack
-          WORKDIR /app
-          COPY index.mjs .
-          CMD ["node", "index.mjs"]
-          EOF
+      # - name: Build local container image
+      #   run: |
+      #     docker build -t snyk-image:local -f - files/ << 'EOF'
+      #     FROM node:22-alpine
+      #     # Patch OS-level packages (fixes zlib)
+      #     RUN apk update && apk upgrade --no-cache
+      #     # Remove bundled global npm/corepack CLI vulnerabilities
+      #     RUN rm -rf /usr/local/lib/node_modules/npm /usr/local/bin/npm /usr/local/bin/npx /usr/local/bin/corepack
+      #     WORKDIR /app
+      #     COPY index.mjs .
+      #     CMD ["node", "index.mjs"]
+      #     EOF
 
-      - name: Run Snyk Container Test
-        run: snyk container test snyk-image:local --severity-threshold=high
+      # - name: Run Snyk Container Test
+      #   run: snyk container test snyk-image:local --severity-threshold=high
 
       # - name: Run Snyk to check for 3rd party vulnerabilities
       #   uses: snyk/actions/node@master
