@@ -98,23 +98,65 @@ jobs:
     needs: terraform-checks
     steps:
       - name: Check out repository code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: npm install
+        
       - name: Install Snyk CLI
         run: npm install -g snyk
-      - name: Run Snyk to check for 3rd party vulnerabilities
-        uses: snyk/actions/node@master
+
+      - name: Authenticate Snyk
+        run: snyk auth ${{ secrets.SNYK_TOKEN }}
+
+        # 1. Static Application Security Testing (SAST)
+      - name: Run Snyk Code Test
+        run: snyk code test files/
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-        with:
-          args: --severity-threshold=high
-      - name: Run Snyk to check for vulnerabilities in Open Source Components
+        
+        # 2. Open Source / 3rd Party Dependency Scan
+      - name: Run Snyk Open Source Test
         run: snyk test --severity-threshold=high
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-      - name: Run Snyk to check for vulnerabilities in Terraform project
+
+      # 3. Infrastructure as Code (IaC) Scan on Terraform
+      - name: Run Snyk IaC Test
         run: snyk iac test --severity-threshold=high
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+
+      # 4. Build and Scan Container Image
+      - name: Build local container image
+        run: |
+          docker build -t snyk-image:local -f - files/ << 'EOF'
+          FROM node:22-alpine
+          WORKDIR /app
+          COPY index.mjs .
+          CMD ["node", "index.mjs"]
+          EOF
+
+      - name: Run Snyk Container Test
+        run: snyk container test snyk-image:local --severity-threshold=high
+
+      # - name: Run Snyk to check for 3rd party vulnerabilities
+      #   uses: snyk/actions/node@master
+      #   env:
+      #     SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+      #   with:
+      #     args: --severity-threshold=high
+
+      # - name: Run Snyk to check for vulnerabilities in Open Source Components
+      #   run: snyk test --severity-threshold=high
+      #   env:
+      #     SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+
+      # - name: Run Snyk to check for vulnerabilities in Terraform project
+      #   run: snyk iac test --severity-threshold=high
+      #   env:
+      #     SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
   #################################################
   # Finally, update summary for snyk-check        #
