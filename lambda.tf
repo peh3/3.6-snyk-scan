@@ -1,7 +1,7 @@
 # Defines the lambda function code that will be zipped
 
 data "archive_file" "lambda" {
-  type        = "zip"
+  type = "zip"
   # source_file = "./files/${var.lambda_file_name}.mjs"
   # output_path = "./files/${var.lambda_file_name}.zip"
   source_file = "${path.module}/files/index.mjs"
@@ -11,7 +11,7 @@ data "archive_file" "lambda" {
 # Defines the lambda function to be created using file
 
 resource "aws_lambda_function" "own_lambda" {
-  function_name    = var.lambda_function_name
+  function_name = var.lambda_function_name
   #handler          = "lambda_function.lambda_handler"
   runtime          = "nodejs22.x"
   handler          = "index.handler"
