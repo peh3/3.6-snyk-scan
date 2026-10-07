@@ -133,6 +133,10 @@ jobs:
         run: |
           docker build -t snyk-image:local -f - files/ << 'EOF'
           FROM node:22-alpine
+          # Patch OS-level packages (fixes zlib)
+          RUN apk update && apk upgrade --no-cache
+          # Remove bundled global npm/corepack CLI vulnerabilities
+          RUN rm -rf /usr/local/lib/node_modules/npm /usr/local/bin/npm /usr/local/bin/npx /usr/local/bin/corepack
           WORKDIR /app
           COPY index.mjs .
           CMD ["node", "index.mjs"]
