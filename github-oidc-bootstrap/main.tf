@@ -29,12 +29,11 @@ resource "aws_iam_role" "github_oidc" {
 resource "aws_iam_role_policy_attachment" "managed_policies" {
   for_each = toset([
     "arn:aws:iam::aws:policy/AmazonS3FullAccess",
-    "arn:aws:iam::aws:policy/AmazonRoute53FullAccess",
-    "arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess",
-    "arn:aws:iam::aws:policy/AmazonAPIGatewayAdministrator",
-    "arn:aws:iam::aws:policy/AWSCertificateManagerFullAccess",
-    "arn:aws:iam::aws:policy/AWSLambda_FullAccess",
-    "arn:aws:iam::aws:policy/AWSWAFFullAccess"
+    #"arn:aws:iam::aws:policy/AmazonRoute53FullAccess",
+    #"arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess",
+    ##"arn:aws:iam::aws:policy/AWSCertificateManagerFullAccess",
+    #"arn:aws:iam::aws:policy/AWSWAFFullAccess",
+    "arn:aws:iam::aws:policy/AWSLambda_FullAccess"
   ])
 
   role       = aws_iam_role.github_oidc.name
