@@ -19,7 +19,7 @@ resource "aws_lambda_function" "own_lambda" {
   filename         = data.archive_file.lambda.output_path         # Adjust the path
   source_code_hash = data.archive_file.lambda.output_base64sha256 # Adjust the path
 
-  tracing_config {
-    mode = "PassThrough" # or "Active"
-  }
+  # tracing_config {
+  #   mode = "PassThrough" # or "Active"
+  # }
 }
