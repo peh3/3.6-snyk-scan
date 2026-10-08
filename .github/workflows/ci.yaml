@@ -126,6 +126,14 @@ jobs:
       - name: Run Snyk IaC Test
         run: snyk iac test --severity-threshold=low
 
+      # 2. Monitor: Record baseline inventory to app.snyk.io
+      - name: Snyk Monitor (Open Source)
+        run: snyk monitor
+
+      - name: Snyk Monitor (IaC)
+        #run: snyk iac capture-config --report # or 
+        run: snyk iac test --report
+
       # 4. Build and Scan Container Image
       # - name: Build local container image
       #   run: |
