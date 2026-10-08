@@ -120,11 +120,11 @@ jobs:
         
         # 2. Open Source / 3rd Party Dependency Scan
       - name: Run Snyk Open Source Test
-        run: snyk test --severity-threshold=high
+        run: snyk test --severity-threshold=low
 
       # 3. Infrastructure as Code (IaC) Scan on Terraform
       - name: Run Snyk IaC Test
-        run: snyk iac test --severity-threshold=high
+        run: snyk iac test --severity-threshold=low
 
       # 4. Build and Scan Container Image
       # - name: Build local container image
@@ -165,13 +165,14 @@ jobs:
   # Update needs statement to include snyk-checks #
   #################################################
   summary:
-    needs: [terraform-checks] # add snyk-checks 
+    needs: [terraform-checks, snyk-checks] # add snyk-checks
+    if: always() 
     runs-on: ubuntu-latest
     steps:
       - name: Adding markdown
         run: |
           TF_STATUS=${{ needs.terraform-checks.outputs.status }}
-          # SNYK_STATUS=${{ needs.snyk-checks.outputs.status }}
+          SNYK_STATUS=${{ needs.snyk-checks.outputs.status }}
 
           echo '## 🚀 Preparing Build Summary 🚀' >> $GITHUB_STEP_SUMMARY
           echo '' >> $GITHUB_STEP_SUMMARY
@@ -179,7 +180,7 @@ jobs:
           echo "| Job Name        | Status |" >> $GITHUB_STEP_SUMMARY
           echo "|-----------------|--------|" >> $GITHUB_STEP_SUMMARY
           echo "| tf-check       | $TF_STATUS |" >> $GITHUB_STEP_SUMMARY
-          # echo " snyk-check     | $SNYK_STATUS |" >> $GITHUB_STEP_SUMMARY
+          echo " snyk-check     | $SNYK_STATUS |" >> $GITHUB_STEP_SUMMARY
           echo '' >> $GITHUB_STEP_SUMMARY
 
           echo '## Job ran by: ${{ github.actor }}' >> $GITHUB_STEP_SUMMARY
